@@ -70,11 +70,15 @@ $(document).ready(function(){
 			$("#boso-kiemtra").val(boso);
 			var socon = boso.split(',').length;
 			$("#tong-so-con").text(socon);
+			var ngay_chon_bat_dau = $("#ngay-chon-bat-dau").val();
+			var ngay_chon_ket_thuc = $("#ngay-chon-ket-thuc").val();
 			$.ajax({
 				url: "dacbiets/dulieu_trave",
 				type: 'POST',
 				data : {
-					boso : boso
+					boso : boso,
+					ngay_chon_bat_dau : ngay_chon_bat_dau,
+					ngay_chon_ket_thuc : ngay_chon_ket_thuc
 				},
 				beforeSend:function() {
 					$(".bg_load").show();
@@ -92,7 +96,12 @@ $(document).ready(function(){
 					$("#trung-lien-tiep").text(data.so_ngay_an_thong);
 					$("#ngay-lien-tiep-bat-dau").text(data.ngay_bat_dau_an_thong);
 					$("#ngay-lien-tiep-ket-thuc").text(data.ngay_ket_thuc_an_thong);
-					// $(".boso").attr("checked", false).attr("disabled", false);
+					var date_bat_dau = new Date(ngay_chon_bat_dau);
+					var ngay_chon_bat_dau_text = date_bat_dau.getDate() + "/" + (date_bat_dau.getMonth() + 1) + "/" + date_bat_dau.getFullYear();
+					$("#ngay-chon-bat-dau-hien-thi").text(ngay_chon_bat_dau_text);
+					var date_ket_thuc = new Date(ngay_chon_ket_thuc);
+					var ngay_chon_ket_thuc_text = date_ket_thuc.getDate() + "/" + (date_ket_thuc.getMonth() + 1) + "/" + date_ket_thuc.getFullYear();
+					$("#ngay-chon-ket-thuc-hien-thi").text(ngay_chon_ket_thuc_text);
 		    	}
 			});
 

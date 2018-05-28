@@ -277,3 +277,11 @@ span.number {
 .modal {
     top : 20%;
 }
+
+table.table-kq-bold-border {
+    border: 4px solid #7e7e7e;
+}
+
+table.table-kq-bold-border th{
+    text-align: center;
+}

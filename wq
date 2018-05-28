@@ -1,0 +1,308 @@
+warning: LF will be replaced by CRLF in app/Config/core.php.
+The file will have its original line endings in your working directory.
+[1mdiff --git a/app/Config/core.php b/app/Config/core.php[m
+[1mindex dab8404..308b054 100644[m
+[1m--- a/app/Config/core.php[m
+[1m+++ b/app/Config/core.php[m
+[36m@@ -34,7 +34,7 @@[m
+  * In production mode, flash messages redirect after a time interval.[m
+  * In development mode, you need to click the flash message to continue.[m
+  */[m
+[31m-	Configure::write('debug', 2);[m
+[32m+[m	[32mConfigure::write('debug', 0);[m
+ [m
+ /**[m
+  * Configure the Error handler used to handle errors for your application. By default[m
+[1mdiff --git a/app/Controller/DacbietsController.php b/app/Controller/DacbietsController.php[m
+[1mindex 1747905..760e6b5 100644[m
+[1m--- a/app/Controller/DacbietsController.php[m
+[1m+++ b/app/Controller/DacbietsController.php[m
+[36m@@ -188,13 +188,15 @@[m [mclass DacbietsController extends AppController {[m
+ 		if ($this->request->is('ajax')) {[m
+ 			$data = $this->request->data;[m
+ 			$loto_array = explode(",", str_replace(" ", "",$data["boso"]));[m
+[31m-			$ngay_gan = $this->Dacbiet->diem_gan_den_nay($loto_array);[m
+[32m+[m			[32m$ngay_gan = $this->Dacbiet->diem_gan_den_nay($loto_array,$data["ngay_chon_bat_dau"],$data["ngay_chon_ket_thuc"]);[m
+ 			$this->loadModel("Dacbiet");[m
+ 			$dacbiets = $this->Dacbiet->find("all",array([m
+ 				"fields" => array("unix_timestamp(ngay_tao) AS time_ngay_tao,ngay_tao"),[m
+ 				"conditions" => array([m
+ 					"loto" => $loto_array,[m
+[31m-					"ngoai_le" => "0"[m
+[32m+[m					[32m"ngoai_le" => "0",[m
+[32m+[m					[32m"ngay_tao >=" => $data["ngay_chon_bat_dau"],[m
+[32m+[m					[32m"ngay_tao <=" => $data["ngay_chon_ket_thuc"],[m
+ 				),[m
+ 				"order" => ("ngay_tao desc"),[m
+ 			));[m
+[36m@@ -242,7 +244,7 @@[m [mclass DacbietsController extends AppController {[m
+ 					$ngay_bat_dau_an_thong = $ngay_ket_thuc_an_thong = $dacbiet["Dacbiet"]["ngay_tao"];[m
+ 				}[m
+ 			}[m
+[31m-[m
+[32m+[m			[32m$dataRes["data"] = $data;[m
+ 			$dataRes["date_start"] = date("d/m/Y",strtotime($dataRes["date_start"]));[m
+ 			$dataRes["date_end"] = date("d/m/Y",strtotime($dataRes["date_end"]));[m
+ 			$dataRes["diem_gan"] = $ngay_gan;[m
+[36m@@ -256,6 +258,8 @@[m [mclass DacbietsController extends AppController {[m
+ 	}[m
+ [m
+ 	public function soicaulo() {[m
+[32m+[m		[32m// $this->layout = false;[m
+[32m+[m		[32m// $this->autoRender = false;[m
+ 		$kqsx_hq = $this->Dacbiet->find("first",array([m
+ 			"fields" => array("loto","ngay_tao"),[m
+ 			"conditions" => array([m
+[36m@@ -287,7 +291,8 @@[m [mclass DacbietsController extends AppController {[m
+ 				"fields" => array("Dacbiet.ngay_tao"),[m
+ 				"conditions" => array([m
+ 					"Dacbiet.loto" => $kqsx_hq["Dacbiet"]["loto"],[m
+[31m-					"Dacbiet.ngoai_le" => "0"[m
+[32m+[m					[32m"Dacbiet.ngoai_le" => "0",[m
+[32m+[m					[32m"Dacbiet.ngay_tao < " => $ngay_tim_kiem[m
+ 				),[m
+ 				"order" => array("ngay_tao desc")[m
+ 			));[m
+[36m@@ -330,7 +335,40 @@[m [mclass DacbietsController extends AppController {[m
+ 			}[m
+ 			$this->set("giaidb_hn",$kqsx_hq["Dacbiet"]["loto"]);[m
+ 		}[m
+[31m-		$this->set(compact("solieu_cantims","ngay_tim_kiem","kq_thu_nhat","kq_thu_hai","kq_thu_ba"));[m
+[32m+[m		[32m$dan_ngay_thu_nhats = $this->kiem_tra_dang_solieu($kq_thu_nhat);[m
+[32m+[m		[32m$dan_ngay_thu_hais = $this->kiem_tra_dang_solieu($kq_thu_hai);[m
+[32m+[m		[32m$dan_ngay_thu_bas = $this->kiem_tra_dang_solieu($kq_thu_ba);[m
+[32m+[m		[32m$this->set(compact("solieu_cantims","ngay_tim_kiem","kq_thu_nhat","kq_thu_hai","kq_thu_ba","dan_ngay_thu_nhats","dan_ngay_thu_hais","dan_ngay_thu_bas"));[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mpublic function kiem_tra_dang_solieu ($solieus) {[m
+[32m+[m		[32mforeach ($solieus as $solieu) {[m
+[32m+[m			[32m$so_thu_nhat = substr($solieu, 0,1);[m
+[32m+[m			[32m$so_thu_hai = substr($solieu, 1,2);[m
+[32m+[m			[32mif (isset($dan_theo_ngay["dau"][$so_thu_nhat])) {[m
+[32m+[m				[32m$dan_theo_ngay["dau"][$so_thu_nhat] += 1;[m
+[32m+[m			[32m} else {[m
+[32m+[m				[32m$dan_theo_ngay["dau"][$so_thu_nhat] = 1;[m
+[32m+[m			[32m}[m
+[32m+[m			[32mif (isset($dan_theo_ngay["dit"][$so_thu_hai])) {[m
+[32m+[m				[32m$dan_theo_ngay["dit"][$so_thu_hai] += 1;[m
+[32m+[m			[32m} else {[m
+[32m+[m				[32m$dan_theo_ngay["dit"][$so_thu_hai] = 1;[m
+[32m+[m			[32m}[m
+[32m+[m			[32m$tong = $so_thu_nhat + $so_thu_hai;[m
+[32m+[m			[32mif ($tong > 10) {[m[41m	[m
+[32m+[m				[32m$tong = substr($tong, 1,2);[m
+[32m+[m			[32m}[m
+[32m+[m			[32mif (isset($dan_theo_ngay["tong"][$tong])) {[m
+[32m+[m				[32m$dan_theo_ngay["tong"][$tong] += 1;[m
+[32m+[m			[32m} else {[m
+[32m+[m				[32m$dan_theo_ngay["tong"][$tong] = 1;[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m		[32marsort($dan_theo_ngay["dau"]);[m
+[32m+[m		[32marsort($dan_theo_ngay["dit"]);[m
+[32m+[m		[32marsort($dan_theo_ngay["tong"]);[m
+[32m+[m		[32mreturn $dan_theo_ngay;[m
+ 	}[m
+ [m
+ }[m
+[1mdiff --git a/app/Model/Dacbiet.php b/app/Model/Dacbiet.php[m
+[1mindex c15b6b8..8309981 100644[m
+[1m--- a/app/Model/Dacbiet.php[m
+[1m+++ b/app/Model/Dacbiet.php[m
+[36m@@ -313,12 +313,14 @@[m [mclass Dacbiet extends AppModel {[m
+ 		return $res;[m
+ 	}[m
+ [m
+[31m-	public function diem_gan_den_nay($loto) {[m
+[32m+[m	[32mpublic function diem_gan_den_nay($loto,$ngay_chon_bat_dau,$ngay_chon_ket_thuc) {[m
+ 		$dulieu_ngaygan = $this->find("first",array([m
+ 			"fields" => array("ngay_tao"),[m
+ 			"conditions" => array([m
+ 				"loto" => $loto,[m
+[31m-				"ngoai_le" => "0"[m
+[32m+[m				[32m"ngoai_le" => "0",[m
+[32m+[m				[32m"ngay_tao >=" => $ngay_chon_bat_dau,[m
+[32m+[m				[32m"ngay_tao <=" => $ngay_chon_ket_thuc,[m
+ 			),[m
+ 			"order" => array("ngay_tao desc"),[m
+ 			"contain" => array()[m
+[1mdiff --git a/app/View/Bosos/timkiemboso.ctp b/app/View/Bosos/timkiemboso.ctp[m
+[1mindex 199cccb..8871263 100644[m
+[1m--- a/app/View/Bosos/timkiemboso.ctp[m
+[1m+++ b/app/View/Bosos/timkiemboso.ctp[m
+[36m@@ -1,4 +1,11 @@[m
+ <div class="row boder">[m
+[32m+[m	[32m<div class="col-md-8 col-md-push-2">[m
+[32m+[m		[32m<div class="content_form">[m
+[32m+[m			[32m<?php echo __("Ngày bắt đầu"); ?>&#8758; <input type="date" value="2000-01-01" name="data[date]" id="ngay-chon-bat-dau">[m
+[32m+[m			[32m<?php echo __("Ngày kết thúc"); ?>&#8758; <input type="date" value="<?php echo date("Y-m-d"); ?>" name="data[date]" id="ngay-chon-ket-thuc">[m
+[32m+[m		[32m<br/>[m
+[32m+[m		[32m</div>[m
+[32m+[m	[32m</div>[m
+ 	<div class="col-md-8 col-md-push-2">[m
+ 		<table class="table">[m
+ 			<tr>[m
+[36m@@ -32,12 +39,12 @@[m
+ 							<font color="red" id="nguong-cuc-dai">0</font>[m
+ 							<font color="red"><?php echo __(" ngày tính cả ngày về "); ?></font>[m
+ 							(<font id="ngay-bat-dau">01/01/2000</font> đến ngày [m
+[31m-							<font id="ngay-ket-thuc">01/01/2000</font>)<br>[m
+[32m+[m							[32m<font id="ngay-ket-thuc"><?php echo date("d/m/Y"); ?></font>)<br>[m
+ 							<?php echo __("Ngày Trúng liên tiếp"); ?>&nbsp;&#8758;[m
+ 							<font color="red" id="trung-lien-tiep">0</font>[m
+ 							<font color="red"><?php echo __(" ngày tính cả ngày về "); ?></font>[m
+ 							(<font id="ngay-lien-tiep-bat-dau">01/01/2000</font> đến ngày [m
+[31m-							<font id="ngay-lien-tiep-ket-thuc">01/01/2000</font>)<br>[m
+[32m+[m							[32m<font id="ngay-lien-tiep-ket-thuc"><?php echo date("d/m/Y"); ?></font>)<br>[m
+ 							<?php echo __("Điểm gan đến nay là"); ?>&nbsp;&#8758;[m
+ 							<font color="red" id="diem-gan">0</font>[m
+ 							<font color="red">&nbsp;<?php echo __("ngày"); ?></font>[m
+[36m@@ -45,6 +52,11 @@[m
+ 							<?php echo __("Tổng số con"); ?>&nbsp;&#8758;[m
+ 							<font color="red" id="tong-so-con">0</font>[m
+ 							<font color="red">&nbsp;<?php echo __("số"); ?></font>[m
+[32m+[m							[32m<br>[m
+[32m+[m							[32m<?php echo __("Thống kê trong khoảng"); ?>&nbsp;&#8758;[m
+[32m+[m							[32m<font color="red" id="ngay-chon-bat-dau-hien-thi"><?php echo "01/01/2000" ?></font>[m[41m [m
+[32m+[m							[32mđến ngày[m[41m [m
+[32m+[m							[32m<font color="red" id="ngay-chon-ket-thuc-hien-thi"><?php echo date("d/m/Y"); ?></font>[m
+ 						</td>[m
+ 					</tr>[m
+ 				</tbody>[m
+[1mdiff --git a/app/View/Dacbiets/soicaulo.ctp b/app/View/Dacbiets/soicaulo.ctp[m
+[1mindex ea4714a..61d6745 100644[m
+[1m--- a/app/View/Dacbiets/soicaulo.ctp[m
+[1m+++ b/app/View/Dacbiets/soicaulo.ctp[m
+[36m@@ -10,68 +10,20 @@[m
+ 	</div>[m
+ 	<div class="col-md-12">[m
+ 		<?php if (!empty($solieu_cantims)): ?>[m
+[31m-			<div class="cat_title">1.Tổng hợp dãy số kết quả đặc biệt đã về sau khi đặc biệt ra [m
+[32m+[m			[32m<div class="cat_title">[m
+[32m+[m				[32m1.Thống kê tần suất loto đặc biệt sau khi giải ĐB xuất hiện[m
+[32m+[m			[32m</div>[m
+[32m+[m			[32m<?php echo $this->element('thong-ke-theo-dan',array("dan_ngays" => $dan_ngay_thu_nhats,"ngay_sau" => "1")); ?>[m
+[32m+[m			[32m<?php echo $this->element('thong-ke-theo-dan',array("dan_ngays" => $dan_ngay_thu_hais,"ngay_sau" => "2")); ?>[m
+[32m+[m			[32m<?php echo $this->element('thong-ke-theo-dan',array("dan_ngays" => $dan_ngay_thu_bas,"ngay_sau" => "3")); ?>[m
+[32m+[m			[32m<div class="cat_title">2.Tổng hợp dãy số kết quả đặc biệt đã về sau khi đặc biệt ra[m[41m [m
+ 				<span class="number"><?php echo $giaidb_hn; ?></span> ra ngày [m
+ 				<span class="date"><?php echo $ngay_tim_kiem; ?></span>[m
+ 			</div>[m
+[31m-			<div style=" padding-left: 15px;" align="left">[m
+[31m-				<div class="cat_content">[m
+[31m-					<div><b>Sau 1 ngày :</b></div>[m
+[31m-					<?php [m
+[31m-						$dayso_thunhats = array_count_values($kq_thu_nhat);[m
+[31m-						arsort($dayso_thunhats);[m
+[31m-					?>[m
+[31m-					<?php foreach ($dayso_thunhats as $key_dayso => $dayso_thunhat): ?>[m
+[31m-						<span class="number"><?php echo $key_dayso ?></span>[m
+[31m-						<span style="font-size: 11px">: <?php echo $dayso_thunhat ?> lần,</span>[m
+[31m-					<?php endforeach ?>[m
+[31m-					<div style="clear: both;"></div>[m
+[31m-					<br>[m
+[31m-					<?php sort($kq_thu_nhat); ?>[m
+[31m-					<div><b><?php echo implode(", ",array_unique($kq_thu_nhat)) ?></b></div>[m
+[31m-					<div style="clear: both;"></div>[m
+[31m-				</div>[m
+[31m-			</div>[m
+[31m-			<br/>[m
+[31m-				<div style=" padding-left: 15px;" align="left">[m
+[31m-				<div class="cat_content">[m
+[31m-					<div><b>Sau 2 ngày :</b></div>[m
+[31m-					<?php [m
+[31m-						$dayso_thuhais = array_count_values($kq_thu_hai);[m
+[31m-						arsort($dayso_thuhais);[m
+[31m-					?>[m
+[31m-					<?php foreach ($dayso_thuhais as $key_dayso_hai => $dayso_thuhai): ?>[m
+[31m-						<span class="number"><?php echo $key_dayso_hai ?></span>[m
+[31m-						<span style="font-size: 11px">: <?php echo $dayso_thuhai ?> lần,</span>[m
+[31m-					<?php endforeach ?>[m
+[31m-					<div style="clear: both;"></div>[m
+[31m-					<br>[m
+[31m-					<?php sort($kq_thu_hai); ?>[m
+[31m-					<div><b><?php echo implode(", ",array_unique($kq_thu_hai)) ?></b></div>[m
+[31m-					<div style="clear: both;"></div>[m
+[31m-				</div>[m
+[31m-			</div>[m
+[31m-			<br/>[m
+[31m-				<div style=" padding-left: 15px;" align="left">[m
+[31m-				<div class="cat_content">[m
+[31m-					<div><b>Sau 3 ngày :</b></div>[m
+[31m-					<?php [m
+[31m-						$dayso_thubas = array_count_values($kq_thu_ba);[m
+[31m-						arsort($dayso_thubas);[m
+[31m-					?>[m
+[31m-					<?php foreach ($dayso_thubas as $key_dayso_ba => $dayso_thuba): ?>[m
+[31m-						<span class="number"><?php echo $key_dayso_ba ?></span>[m
+[31m-						<span style="font-size: 11px">: <?php echo $dayso_thuba ?> lần,</span>[m
+[31m-					<?php endforeach ?>[m
+[31m-					<div style="clear: both;"></div>[m
+[31m-					<br>[m
+[31m-					<?php sort($kq_thu_ba); ?>[m
+[31m-					<div><b><?php echo implode(", ",array_unique($kq_thu_ba)) ?></b></div>[m
+[31m-					<div style="clear: both;"></div>[m
+[31m-				</div>[m
+[31m-			</div>[m
+[31m-			<br/>[m
+[31m-			<div class="cat_title">2.Các kết quả đặc biệt đã về sau khi giải đặc biệt xuất hiện 2 số cuối là[m
+[32m+[m			[32m<?php echo $this->element('thong-ke-tung-so',array("kq" => $kq_thu_nhat,"ngay_sau" => "1")); ?>[m
+[32m+[m			[32m<?php echo $this->element('thong-ke-tung-so',array("kq" => $kq_thu_hai,"ngay_sau" => "2")); ?>[m
+[32m+[m			[32m<?php echo $this->element('thong-ke-tung-so',array("kq" => $kq_thu_ba,"ngay_sau" => "3")); ?>[m
+[32m+[m			[32m<div class="cat_title">3.Các kết quả đặc biệt đã về sau khi giải đặc biệt xuất hiện 2 số cuối là[m
+ 			 	<span class="number"><?php echo $giaidb_hn; ?></span> ra ngày [m
+ 				<span class="date"><?php echo $ngay_tim_kiem; ?></span>[m
+ 			</div>[m
+[1mdiff --git a/app/webroot/css/newstyle.css b/app/webroot/css/newstyle.css[m
+[1mindex 82345c3..8b5cd7c 100644[m
+[1m--- a/app/webroot/css/newstyle.css[m
+[1m+++ b/app/webroot/css/newstyle.css[m
+[36m@@ -276,4 +276,12 @@[m [mspan.number {[m
+ [m
+ .modal {[m
+     top : 20%;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mtable.table-kq-bold-border {[m
+[32m+[m[32m    border: 4px solid #7e7e7e;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mtable.table-kq-bold-border th{[m
+[32m+[m[32m    text-align: center;[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/app/webroot/js/boso/timkiemboso.js b/app/webroot/js/boso/timkiemboso.js[m
+[1mindex 789aed9..b215b27 100644[m
+[1m--- a/app/webroot/js/boso/timkiemboso.js[m
+[1m+++ b/app/webroot/js/boso/timkiemboso.js[m
+[36m@@ -70,11 +70,15 @@[m [m$(document).ready(function(){[m
+ 			$("#boso-kiemtra").val(boso);[m
+ 			var socon = boso.split(',').length;[m
+ 			$("#tong-so-con").text(socon);[m
+[32m+[m			[32mvar ngay_chon_bat_dau = $("#ngay-chon-bat-dau").val();[m
+[32m+[m			[32mvar ngay_chon_ket_thuc = $("#ngay-chon-ket-thuc").val();[m
+ 			$.ajax({[m
+ 				url: "dacbiets/dulieu_trave",[m
+ 				type: 'POST',[m
+ 				data : {[m
+[31m-					boso : boso[m
+[32m+[m					[32mboso : boso,[m
+[32m+[m					[32mngay_chon_bat_dau : ngay_chon_bat_dau,[m
+[32m+[m					[32mngay_chon_ket_thuc : ngay_chon_ket_thuc[m
+ 				},[m
+ 				beforeSend:function() {[m
+ 					$(".bg_load").show();[m
+[36m@@ -92,7 +96,12 @@[m [m$(document).ready(function(){[m
+ 					$("#trung-lien-tiep").text(data.so_ngay_an_thong);[m
+ 					$("#ngay-lien-tiep-bat-dau").text(data.ngay_bat_dau_an_thong);[m
+ 					$("#ngay-lien-tiep-ket-thuc").text(data.ngay_ket_thuc_an_thong);[m
+[31m-					// $(".boso").attr("checked", false).attr("disabled", false);[m
+[32m+[m					[32mvar date_bat_dau = new Date(ngay_chon_bat_dau);[m
+[32m+[m					[32mvar ngay_chon_bat_dau_text = date_bat_dau.getDate() + "/" + (date_bat_dau.getMonth() + 1) + "/" + date_bat_dau.getFullYear();[m
+[32m+[m					[32m$("#ngay-chon-bat-dau-hien-thi").text(ngay_chon_bat_dau_text);[m
+[32m+[m					[32mvar date_ket_thuc = new Date(ngay_chon_ket_thuc);[m
+[32m+[m					[32mvar ngay_chon_ket_thuc_text = date_ket_thuc.getDate() + "/" + (date_ket_thuc.getMonth() + 1) + "/" + date_ket_thuc.getFullYear();[m
+[32m+[m					[32m$("#ngay-chon-ket-thuc-hien-thi").text(ngay_chon_ket_thuc_text);[m
+ 		    	}[m
+ 			});[m
+ [m

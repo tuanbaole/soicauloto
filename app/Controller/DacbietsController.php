@@ -188,13 +188,15 @@ class DacbietsController extends AppController {
 		if ($this->request->is('ajax')) {
 			$data = $this->request->data;
 			$loto_array = explode(",", str_replace(" ", "",$data["boso"]));
-			$ngay_gan = $this->Dacbiet->diem_gan_den_nay($loto_array);
+			$ngay_gan = $this->Dacbiet->diem_gan_den_nay($loto_array,$data["ngay_chon_bat_dau"],$data["ngay_chon_ket_thuc"]);
 			$this->loadModel("Dacbiet");
 			$dacbiets = $this->Dacbiet->find("all",array(
 				"fields" => array("unix_timestamp(ngay_tao) AS time_ngay_tao,ngay_tao"),
 				"conditions" => array(
 					"loto" => $loto_array,
-					"ngoai_le" => "0"
+					"ngoai_le" => "0",
+					"ngay_tao >=" => $data["ngay_chon_bat_dau"],
+					"ngay_tao <=" => $data["ngay_chon_ket_thuc"],
 				),
 				"order" => ("ngay_tao desc"),
 			));
@@ -242,7 +244,7 @@ class DacbietsController extends AppController {
 					$ngay_bat_dau_an_thong = $ngay_ket_thuc_an_thong = $dacbiet["Dacbiet"]["ngay_tao"];
 				}
 			}
-
+			$dataRes["data"] = $data;
 			$dataRes["date_start"] = date("d/m/Y",strtotime($dataRes["date_start"]));
 			$dataRes["date_end"] = date("d/m/Y",strtotime($dataRes["date_end"]));
 			$dataRes["diem_gan"] = $ngay_gan;
@@ -256,6 +258,8 @@ class DacbietsController extends AppController {
 	}
 
 	public function soicaulo() {
+		// $this->layout = false;
+		// $this->autoRender = false;
 		$kqsx_hq = $this->Dacbiet->find("first",array(
 			"fields" => array("loto","ngay_tao"),
 			"conditions" => array(
@@ -287,7 +291,8 @@ class DacbietsController extends AppController {
 				"fields" => array("Dacbiet.ngay_tao"),
 				"conditions" => array(
 					"Dacbiet.loto" => $kqsx_hq["Dacbiet"]["loto"],
-					"Dacbiet.ngoai_le" => "0"
+					"Dacbiet.ngoai_le" => "0",
+					"Dacbiet.ngay_tao < " => $ngay_tim_kiem
 				),
 				"order" => array("ngay_tao desc")
 			));
@@ -330,7 +335,40 @@ class DacbietsController extends AppController {
 			}
 			$this->set("giaidb_hn",$kqsx_hq["Dacbiet"]["loto"]);
 		}
-		$this->set(compact("solieu_cantims","ngay_tim_kiem","kq_thu_nhat","kq_thu_hai","kq_thu_ba"));
+		$dan_ngay_thu_nhats = $this->kiem_tra_dang_solieu($kq_thu_nhat);
+		$dan_ngay_thu_hais = $this->kiem_tra_dang_solieu($kq_thu_hai);
+		$dan_ngay_thu_bas = $this->kiem_tra_dang_solieu($kq_thu_ba);
+		$this->set(compact("solieu_cantims","ngay_tim_kiem","kq_thu_nhat","kq_thu_hai","kq_thu_ba","dan_ngay_thu_nhats","dan_ngay_thu_hais","dan_ngay_thu_bas"));
+	}
+
+	public function kiem_tra_dang_solieu ($solieus) {
+		foreach ($solieus as $solieu) {
+			$so_thu_nhat = substr($solieu, 0,1);
+			$so_thu_hai = substr($solieu, 1,2);
+			if (isset($dan_theo_ngay["dau"][$so_thu_nhat])) {
+				$dan_theo_ngay["dau"][$so_thu_nhat] += 1;
+			} else {
+				$dan_theo_ngay["dau"][$so_thu_nhat] = 1;
+			}
+			if (isset($dan_theo_ngay["dit"][$so_thu_hai])) {
+				$dan_theo_ngay["dit"][$so_thu_hai] += 1;
+			} else {
+				$dan_theo_ngay["dit"][$so_thu_hai] = 1;
+			}
+			$tong = $so_thu_nhat + $so_thu_hai;
+			if ($tong > 10) {	
+				$tong = substr($tong, 1,2);
+			}
+			if (isset($dan_theo_ngay["tong"][$tong])) {
+				$dan_theo_ngay["tong"][$tong] += 1;
+			} else {
+				$dan_theo_ngay["tong"][$tong] = 1;
+			}
+		}
+		arsort($dan_theo_ngay["dau"]);
+		arsort($dan_theo_ngay["dit"]);
+		arsort($dan_theo_ngay["tong"]);
+		return $dan_theo_ngay;
 	}
 
 }

@@ -313,12 +313,14 @@ class Dacbiet extends AppModel {
 		return $res;
 	}
 
-	public function diem_gan_den_nay($loto) {
+	public function diem_gan_den_nay($loto,$ngay_chon_bat_dau,$ngay_chon_ket_thuc) {
 		$dulieu_ngaygan = $this->find("first",array(
 			"fields" => array("ngay_tao"),
 			"conditions" => array(
 				"loto" => $loto,
-				"ngoai_le" => "0"
+				"ngoai_le" => "0",
+				"ngay_tao >=" => $ngay_chon_bat_dau,
+				"ngay_tao <=" => $ngay_chon_ket_thuc,
 			),
 			"order" => array("ngay_tao desc"),
 			"contain" => array()

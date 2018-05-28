@@ -10,68 +10,20 @@
 	</div>
 	<div class="col-md-12">
 		<?php if (!empty($solieu_cantims)): ?>
-			<div class="cat_title">1.Tổng hợp dãy số kết quả đặc biệt đã về sau khi đặc biệt ra 
+			<div class="cat_title">
+				1.Thống kê tần suất loto đặc biệt sau khi giải ĐB xuất hiện
+			</div>
+			<?php echo $this->element('thong-ke-theo-dan',array("dan_ngays" => $dan_ngay_thu_nhats,"ngay_sau" => "1")); ?>
+			<?php echo $this->element('thong-ke-theo-dan',array("dan_ngays" => $dan_ngay_thu_hais,"ngay_sau" => "2")); ?>
+			<?php echo $this->element('thong-ke-theo-dan',array("dan_ngays" => $dan_ngay_thu_bas,"ngay_sau" => "3")); ?>
+			<div class="cat_title">2.Tổng hợp dãy số kết quả đặc biệt đã về sau khi đặc biệt ra 
 				<span class="number"><?php echo $giaidb_hn; ?></span> ra ngày 
 				<span class="date"><?php echo $ngay_tim_kiem; ?></span>
 			</div>
-			<div style=" padding-left: 15px;" align="left">
-				<div class="cat_content">
-					<div><b>Sau 1 ngày :</b></div>
-					<?php 
-						$dayso_thunhats = array_count_values($kq_thu_nhat);
-						arsort($dayso_thunhats);
-					?>
-					<?php foreach ($dayso_thunhats as $key_dayso => $dayso_thunhat): ?>
-						<span class="number"><?php echo $key_dayso ?></span>
-						<span style="font-size: 11px">: <?php echo $dayso_thunhat ?> lần,</span>
-					<?php endforeach ?>
-					<div style="clear: both;"></div>
-					<br>
-					<?php sort($kq_thu_nhat); ?>
-					<div><b><?php echo implode(", ",array_unique($kq_thu_nhat)) ?></b></div>
-					<div style="clear: both;"></div>
-				</div>
-			</div>
-			<br/>
-				<div style=" padding-left: 15px;" align="left">
-				<div class="cat_content">
-					<div><b>Sau 2 ngày :</b></div>
-					<?php 
-						$dayso_thuhais = array_count_values($kq_thu_hai);
-						arsort($dayso_thuhais);
-					?>
-					<?php foreach ($dayso_thuhais as $key_dayso_hai => $dayso_thuhai): ?>
-						<span class="number"><?php echo $key_dayso_hai ?></span>
-						<span style="font-size: 11px">: <?php echo $dayso_thuhai ?> lần,</span>
-					<?php endforeach ?>
-					<div style="clear: both;"></div>
-					<br>
-					<?php sort($kq_thu_hai); ?>
-					<div><b><?php echo implode(", ",array_unique($kq_thu_hai)) ?></b></div>
-					<div style="clear: both;"></div>
-				</div>
-			</div>
-			<br/>
-				<div style=" padding-left: 15px;" align="left">
-				<div class="cat_content">
-					<div><b>Sau 3 ngày :</b></div>
-					<?php 
-						$dayso_thubas = array_count_values($kq_thu_ba);
-						arsort($dayso_thubas);
-					?>
-					<?php foreach ($dayso_thubas as $key_dayso_ba => $dayso_thuba): ?>
-						<span class="number"><?php echo $key_dayso_ba ?></span>
-						<span style="font-size: 11px">: <?php echo $dayso_thuba ?> lần,</span>
-					<?php endforeach ?>
-					<div style="clear: both;"></div>
-					<br>
-					<?php sort($kq_thu_ba); ?>
-					<div><b><?php echo implode(", ",array_unique($kq_thu_ba)) ?></b></div>
-					<div style="clear: both;"></div>
-				</div>
-			</div>
-			<br/>
-			<div class="cat_title">2.Các kết quả đặc biệt đã về sau khi giải đặc biệt xuất hiện 2 số cuối là
+			<?php echo $this->element('thong-ke-tung-so',array("kq" => $kq_thu_nhat,"ngay_sau" => "1")); ?>
+			<?php echo $this->element('thong-ke-tung-so',array("kq" => $kq_thu_hai,"ngay_sau" => "2")); ?>
+			<?php echo $this->element('thong-ke-tung-so',array("kq" => $kq_thu_ba,"ngay_sau" => "3")); ?>
+			<div class="cat_title">3.Các kết quả đặc biệt đã về sau khi giải đặc biệt xuất hiện 2 số cuối là
 			 	<span class="number"><?php echo $giaidb_hn; ?></span> ra ngày 
 				<span class="date"><?php echo $ngay_tim_kiem; ?></span>
 			</div>

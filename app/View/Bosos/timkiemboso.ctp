@@ -1,5 +1,12 @@
 <div class="row boder">
 	<div class="col-md-8 col-md-push-2">
+		<div class="content_form">
+			<?php echo __("Ngày bắt đầu"); ?>&#8758; <input type="date" value="2000-01-01" name="data[date]" id="ngay-chon-bat-dau">
+			<?php echo __("Ngày kết thúc"); ?>&#8758; <input type="date" value="<?php echo date("Y-m-d"); ?>" name="data[date]" id="ngay-chon-ket-thuc">
+		<br/>
+		</div>
+	</div>
+	<div class="col-md-8 col-md-push-2">
 		<table class="table">
 			<tr>
 		<?php foreach ($shows as $keyShow => $showArrs): ?>
@@ -32,12 +39,12 @@
 							<font color="red" id="nguong-cuc-dai">0</font>
 							<font color="red"><?php echo __(" ngày tính cả ngày về "); ?></font>
 							(<font id="ngay-bat-dau">01/01/2000</font> đến ngày 
-							<font id="ngay-ket-thuc">01/01/2000</font>)<br>
+							<font id="ngay-ket-thuc"><?php echo date("d/m/Y"); ?></font>)<br>
 							<?php echo __("Ngày Trúng liên tiếp"); ?>&nbsp;&#8758;
 							<font color="red" id="trung-lien-tiep">0</font>
 							<font color="red"><?php echo __(" ngày tính cả ngày về "); ?></font>
 							(<font id="ngay-lien-tiep-bat-dau">01/01/2000</font> đến ngày 
-							<font id="ngay-lien-tiep-ket-thuc">01/01/2000</font>)<br>
+							<font id="ngay-lien-tiep-ket-thuc"><?php echo date("d/m/Y"); ?></font>)<br>
 							<?php echo __("Điểm gan đến nay là"); ?>&nbsp;&#8758;
 							<font color="red" id="diem-gan">0</font>
 							<font color="red">&nbsp;<?php echo __("ngày"); ?></font>
@@ -45,6 +52,11 @@
 							<?php echo __("Tổng số con"); ?>&nbsp;&#8758;
 							<font color="red" id="tong-so-con">0</font>
 							<font color="red">&nbsp;<?php echo __("số"); ?></font>
+							<br>
+							<?php echo __("Thống kê trong khoảng"); ?>&nbsp;&#8758;
+							<font color="red" id="ngay-chon-bat-dau-hien-thi"><?php echo "01/01/2000" ?></font> 
+							đến ngày 
+							<font color="red" id="ngay-chon-ket-thuc-hien-thi"><?php echo date("d/m/Y"); ?></font>
 						</td>
 					</tr>
 				</tbody>
